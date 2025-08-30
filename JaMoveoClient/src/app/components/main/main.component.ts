@@ -85,8 +85,12 @@ export class MainComponent implements OnInit, OnDestroy {
 
     this.signalRService.songSelected
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.router.navigate(['/live']);
+      .subscribe((song) => {
+        console.log('🎵 Song selected in Main Component, navigating to live:', song.name);
+        // מעבר לעמוד Live עם זמן המתנה קצר
+        setTimeout(() => {
+          this.router.navigate(['/live']);
+        }, 500);
       });
 
     this.signalRService.sessionEnded

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { AuthService } from './auth.service';
 import { RehearsalSession, Song } from '../models/song.model';
 import { API_CONFIG } from '../config/api.config';
@@ -11,6 +11,11 @@ import { API_CONFIG } from '../config/api.config';
 export class SignalRService {
   private hubConnection: HubConnection | undefined;
 
+  // שמירת מצב השיר הנוכחי - BehaviorSubject כדי שקומפוננטים חדשים יקבלו את הערך
+  private currentSongSubject = new BehaviorSubject<Song | null>(null);
+  public currentSong$ = this.currentSongSubject.asObservable();
+
+  // Event Subjects
   public songSelected = new Subject<Song>();
   public sessionEnded = new Subject<void>();
   public sessionCreated = new Subject<RehearsalSession>();
@@ -30,6 +35,7 @@ export class SignalRService {
       .withUrl(API_CONFIG.SIGNALR_URL, {
         accessTokenFactory: () => token || ''
       })
+      .withAutomaticReconnect() // הוספת חיבור מחדש אוטומטי
       .build();
 
     try {
@@ -55,7 +61,12 @@ export class SignalRService {
 
     // הודעות על שירים
     this.hubConnection.on('SongSelected', (song: Song) => {
-      debugger
+      console.log('🎵 Song selected received:', song);
+
+      // שמירת השיר במצב
+      this.currentSongSubject.next(song);
+
+      // שליחת event
       this.songSelected.next(song);
     });
 
@@ -71,6 +82,9 @@ export class SignalRService {
     });
 
     this.hubConnection.on('SessionEnded', () => {
+      console.log('🔚 Session ended');
+      // איפוס השיר הנוכחי כשהחזרה מסתיימת
+      this.currentSongSubject.next(null);
       this.sessionEnded.next();
     });
 
@@ -86,10 +100,12 @@ export class SignalRService {
 
     // הודעות על משתמשים
     this.hubConnection.on('UserJoined', (username: string) => {
+      console.log(`👋 User joined: ${username}`);
       this.userJoined.next(username);
     });
 
     this.hubConnection.on('UserLeft', (username: string) => {
+      console.log(`👋 User left: ${username}`);
       this.userLeft.next(username);
     });
 
@@ -98,16 +114,24 @@ export class SignalRService {
       console.error('SignalR Error:', message);
       this.error.next(message);
     });
+
+    // טיפול בחיבור מחדש
+    this.hubConnection.onreconnected(async () => {
+      console.log('🔄 SignalR reconnected, rejoining rehearsal...');
+      await this.joinRehearsal();
+    });
   }
 
   public async joinRehearsal(): Promise<void> {
-    if (this.hubConnection) {
+    if (this.hubConnection && this.hubConnection.state === 'Connected') {
+      console.log('🚪 Joining rehearsal...');
       await this.hubConnection.invoke('JoinRehearsal');
     }
   }
 
   public async leaveRehearsal(): Promise<void> {
     if (this.hubConnection) {
+      console.log('🚪 Leaving rehearsal...');
       await this.hubConnection.invoke('LeaveRehearsal');
     }
   }
@@ -120,6 +144,7 @@ export class SignalRService {
 
   public async selectSong(songId: number): Promise<void> {
     if (this.hubConnection) {
+      console.log('🎵 Selecting song:', songId);
       await this.hubConnection.invoke('SelectSong', songId);
     }
   }
@@ -128,5 +153,10 @@ export class SignalRService {
     if (this.hubConnection) {
       await this.hubConnection.invoke('QuitSession');
     }
+  }
+
+  // מתודה לקבלת השיר הנוכחי
+  public getCurrentSong(): Song | null {
+    return this.currentSongSubject.value;
   }
 }

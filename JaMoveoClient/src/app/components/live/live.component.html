@@ -1,5 +1,23 @@
-@if(currentSong){
 <div class="live-container">
+  @if(loading && !currentSong){
+  <div class="loading-container">
+    <div class="loading-spinner">⏳</div>
+    <h2>טוען שיר...</h2>
+    <p>ממתין לקבלת פרטי השיר</p>
+  </div>
+  }
+
+  @if(error && !currentSong){
+  <div class="error-container">
+    <div class="error-icon">❌</div>
+    <h2>{{ error }}</h2>
+    <button class="refresh-button" (click)="refreshSong()">
+      🔄 נסה שוב
+    </button>
+  </div>
+  }
+
+  @if(currentSong&& !loading){
   <div class="song-header">
     <h1 class="song-title">{{ currentSong.name }}</h1>
     <h2 class="song-artist">{{ currentSong.artist }}</h2>
@@ -60,11 +78,15 @@
     }
 
   </div>
+
+  }
+  @else {
+  <div class="no-song">
+    <h2>No song selected yet</h2>
+    <p>Waiting for the admin to select a song...</p>
+    <button class="back-button" (click)="router.navigate(['/main'])">
+      ← back main page
+    </button>
+  </div>
+  }
 </div>
-}
-@else {
-<div class="no-song">
-  <h2>No song selected yet</h2>
-  <p>Waiting for the admin to select a song...</p>
-</div>
-}

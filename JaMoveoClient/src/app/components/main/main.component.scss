@@ -154,3 +154,74 @@
     font-size: 3rem;
   }
 }
+
+.session-status {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 2rem;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.active-session {
+  color: #4facfe;
+}
+
+.active-session h3 {
+  color: #f093fb;
+  margin-bottom: 1rem;
+}
+
+.connected-users {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.user-badge {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.create-session-button {
+  background: linear-gradient(45deg, #f093fb, #f5576c);
+  color: white;
+  border: none;
+  padding: 1.5rem 3rem;
+  border-radius: 25px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.create-session-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(240, 147, 251, 0.4);
+}
+
+.no-session h3 {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1rem;
+}
+
+.session-info {
+  background: rgba(79, 172, 254, 0.2);
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.session-info p {
+  margin: 0.5rem 0;
+  color: #4facfe;
+  font-weight: bold;
+}

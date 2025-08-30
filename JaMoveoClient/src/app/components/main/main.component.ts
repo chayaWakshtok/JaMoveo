@@ -4,7 +4,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { SignalRService } from '../../services/signalr.service';
-import { SongSearchResult } from '../../models/song.model';
+import { RehearsalSession, SongSearchResult } from '../../models/song.model';
 import { SongService } from '../../services/song.service';
 import { FormsModule } from '@angular/forms';
 
@@ -27,6 +27,9 @@ export class MainComponent implements OnInit, OnDestroy {
   searchResults: SongSearchResult[] = [];
   searching = false;
   waitingMessage = 'Waiting for next song...';
+  currentSession: RehearsalSession | null = null;
+  showCreateSessionButton = false;
+  connectedUsers: string[] = [];
 
 
   ngOnInit(): void {
@@ -43,12 +46,88 @@ export class MainComponent implements OnInit, OnDestroy {
 
     await this.signalRService.startConnection();
 
+    // האזנה לאירועי SignalR
+    this.signalRService.sessionCreated
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((session) => {
+        this.currentSession = session;
+        this.waitingMessage = 'חדר חזרות פעיל - חפש שירים';
+        this.showCreateSessionButton = false;
+      });
     // Listen for song selection
+    this.signalRService.joinedSession
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((session) => {
+        this.currentSession = session;
+        if (this.isAdmin) {
+          this.waitingMessage = 'חדר חזרות פעיל - חפש שירים';
+        } else {
+          this.waitingMessage = 'מחובר לחדר - ממתין לבחירת שיר';
+        }
+        this.showCreateSessionButton = false;
+      });
+
+    this.signalRService.noActiveSession
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((message) => {
+        this.waitingMessage = message;
+        if (this.isAdmin) {
+          this.showCreateSessionButton = true;
+        }
+      });
+
+    this.signalRService.newSessionAvailable
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((message) => {
+        // הצטרף אוטומטית לחדר החדש
+        this.signalRService.joinRehearsal();
+      });
+
     this.signalRService.songSelected
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.router.navigate(['/live']);
       });
+
+    this.signalRService.sessionEnded
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.currentSession = null;
+        this.waitingMessage = 'החזרה הסתיימה';
+        if (this.isAdmin) {
+          this.showCreateSessionButton = true;
+        }
+      });
+
+    this.signalRService.userJoined
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((username) => {
+        if (!this.connectedUsers.includes(username)) {
+          this.connectedUsers.push(username);
+        }
+      });
+
+    this.signalRService.userLeft
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((username) => {
+        this.connectedUsers = this.connectedUsers.filter(user => user !== username);
+      });
+
+    this.signalRService.error
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((error) => {
+        console.error('SignalR Error:', error);
+        this.waitingMessage = `שגיאה: ${error}`;
+      });
+
+    // התחבר לחדר חזרות
+    await this.signalRService.joinRehearsal();
+  }
+
+  async createSession(): Promise<void> {
+    if (this.isAdmin) {
+      await this.signalRService.createNewSession();
+    }
   }
 
   searchSongs(): void {

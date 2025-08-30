@@ -15,3 +15,4 @@ C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Application\obj\Debug\net
 C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Application\obj\Debug\net9.0\JaMoveo.Core.pdb
 C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Application\obj\Debug\net9.0\JaMoveo.Core.genruntimeconfig.cache
 C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Application\obj\Debug\net9.0\ref\JaMoveo.Core.dll
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Application\obj\Debug\net9.0\JaMoveo.Core.sourcelink.json

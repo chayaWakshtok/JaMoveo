@@ -177,3 +177,4 @@ C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Api\obj\Debug\net9.0\ref\
 C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Api\bin\Debug\net9.0\JaMoveo.Core.dll
 C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Api\bin\Debug\net9.0\JaMoveo.Core.pdb
 C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Api\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Api\obj\Debug\net9.0\JaMoveo.Api.sourcelink.json

@@ -12,3 +12,4 @@ C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Debug\
 C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Debug\net9.0\JaMoveo.Infrastructure.pdb
 C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Debug\net9.0\JaMoveo.Infrastructure.genruntimeconfig.cache
 C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Debug\net9.0\ref\JaMoveo.Infrastructure.dll
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Debug\net9.0\JaMoveo.Infrastructure.sourcelink.json

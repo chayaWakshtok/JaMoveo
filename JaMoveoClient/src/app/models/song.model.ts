@@ -29,3 +29,7 @@ export interface SongSearchResponse {
   hasNextPage: number;
   nextPageUrl: number;
 }
+
+export interface RehearsalSession{
+  sessionId: string;
+}

@@ -26,6 +26,7 @@ export class LiveComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.isAdmin = this.authService.isAdmin();
     this.isSinger = this.authService.isSinger();
+    debugger
     this.setupSignalRListeners();
 
     // Get current song if available
@@ -42,6 +43,7 @@ export class LiveComponent implements OnInit, OnDestroy {
     this.signalRService.songSelected
       .pipe(takeUntil(this.destroy$))
       .subscribe((song: Song) => {
+        debugger
         this.currentSong = song;
       });
 

@@ -1,0 +1,41 @@
+<div class="main-container">
+  @if(isAdmin){
+  <!-- Admin View -->
+  <div class="admin-section">
+    <h1 class="main-title">Search any song...</h1>
+
+    <div class="search-section">
+      <div class="search-form">
+        <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="searchSongs()"
+          placeholder="Enter song name or artist" class="search-input">
+        <button (click)="searchSongs()" [disabled]="!searchQuery.trim() || searching" class="search-button">
+          {{ searching ? 'Searching...' : 'Search' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="user-info">
+      <p>Welcome, {{ authService.currentUserValue?.username }}! You're the admin.</p>
+      <button class="logout-button" (click)="logout()">Logout</button>
+    </div>
+  </div>
+  }
+  @else{
+  <!-- Player View -->
+  <div class="player-section">
+    <h1 class="main-title">{{ waitingMessage }}</h1>
+
+    <div class="waiting-animation">
+      <div class="music-note">♫</div>
+      <div class="music-note">♪</div>
+      <div class="music-note">♫</div>
+    </div>
+
+    <div class="user-info">
+      <p>Welcome, {{ authService.currentUserValue?.username }}!</p>
+      <p>Instrument: {{ authService.currentUserValue?.instrument?.toString() }}</p>
+      <button class="logout-button" (click)="logout()">Logout</button>
+    </div>
+  </div>
+  }
+</div>

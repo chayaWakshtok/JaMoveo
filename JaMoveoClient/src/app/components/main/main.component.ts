@@ -21,7 +21,7 @@ export class MainComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
 
   readonly authService = inject(AuthService);
-  isAdmin!: boolean;
+  isAdmin = false;
   searchQuery = '';
   searchResults: SongSearchResult[] = [];
   searching = false;
@@ -42,9 +42,14 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   private async initializeSignalR(): Promise<void> {
-    await this.signalRService.startConnection();
-    this.setupSignalRListeners();
-    await this.signalRService.joinRehearsal();
+    try {
+      await this.signalRService.startConnection();
+      this.setupSignalRListeners();
+      await this.signalRService.joinRehearsal();
+    } catch (error) {
+      console.error('Failed to initialize SignalR:', error);
+      this.waitingMessage = 'שגיאה בחיבור לשרת';
+    }
   }
 
   private setupSignalRListeners(): void {
@@ -88,16 +93,19 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   private handleSessionCreated(session: RehearsalSession): void {
-    this.currentSession = session;
-    this.waitingMessage = 'חדר חזרות פעיל - חפש שירים';
-    this.showCreateSessionButton = false;
+    this.setSessionState(session, 'חדר חזרות פעיל - חפש שירים');
   }
 
   private handleJoinedSession(session: RehearsalSession): void {
-    this.currentSession = session;
-    this.waitingMessage = this.isAdmin
+    const message = this.isAdmin
       ? 'חדר חזרות פעיל - חפש שירים'
       : 'מחובר לחדר - ממתין לבחירת שיר';
+    this.setSessionState(session, message);
+  }
+
+  private setSessionState(session: RehearsalSession, message: string): void {
+    this.currentSession = session;
+    this.waitingMessage = message;
     this.showCreateSessionButton = false;
   }
 
@@ -107,8 +115,7 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   private handleSongSelected(song: any): void {
-    console.log('🎵 Song selected in Main Component, navigating to live:', song.name);
-    setTimeout(() => this.router.navigate(['/live']), 500);
+    this.router.navigate(['/live']);
   }
 
   private handleSessionEnded(): void {
@@ -128,8 +135,8 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   private handleError(error: string): void {
-    console.error('SignalR Error:', error);
-    this.waitingMessage = `שגיאה: ${error}`;
+    console.error('SignalR Error occurred');
+    this.waitingMessage = 'שגיאה בתקשורת עם השרת';
   }
 
   async createSession(): Promise<void> {
@@ -151,12 +158,20 @@ export class MainComponent implements OnInit, OnDestroy {
             state: { results: this.searchResults, query: this.searchQuery }
           });
         },
-        error: () => console.error('Search failed'),
+        error: (error) => {
+          console.error('Search operation failed:', error);
+          this.waitingMessage = 'שגיאה בחיפוש שירים';
+        },
         complete: () => this.searching = false
       });
   }
 
-  logout(): void {
+  async logout(): Promise<void> {
+    try {
+      await this.signalRService.stopConnection();
+    } catch (error) {
+      console.error('Error disconnecting SignalR:', error);
+    }
     this.authService.logout();
     this.router.navigate(['/login']);
   }

@@ -12,7 +12,9 @@ namespace JaMoveo.Core.DTOs
         public string Name { get; set; }
         public string Artist { get; set; }
         public string ImageUrl { get; set; }
-        public List<SongWordDto> SongWords { get; set; } = new List<SongWordDto>();
+
+        public List<List<WordChordPair>> Lines { get; set; } = new List<List<WordChordPair>>();
+
         public string Language { get; set; }
     }
 

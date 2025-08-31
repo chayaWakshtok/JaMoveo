@@ -2,11 +2,11 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { SignalRService } from '../../services/signalr.service';
-import { RehearsalSession, SongSearchResult } from '../../models/song.model';
 import { SongService } from '../../services/song.service';
-import { FormsModule } from '@angular/forms';
+import { RehearsalSession, SongSearchResult } from '../../models/song.model';
 
 @Component({
   selector: 'app-main',
@@ -15,13 +15,12 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./main.component.scss']
 })
 export class MainComponent implements OnInit, OnDestroy {
+  private readonly songService = inject(SongService);
+  private readonly signalRService = inject(SignalRService);
+  private readonly router = inject(Router);
+  private readonly destroy$ = new Subject<void>();
 
-  private songService = inject(SongService);
-  private signalRService = inject(SignalRService)
-  private router = inject(Router);
-  private destroy$ = new Subject<void>();
-
-  authService = inject(AuthService);
+  readonly authService = inject(AuthService);
   isAdmin!: boolean;
   searchQuery = '';
   searchResults: SongSearchResult[] = [];
@@ -43,89 +42,94 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   private async initializeSignalR(): Promise<void> {
-
     await this.signalRService.startConnection();
+    this.setupSignalRListeners();
+    await this.signalRService.joinRehearsal();
+  }
 
-    // האזנה לאירועי SignalR
+  private setupSignalRListeners(): void {
+    const takeUntilDestroy = takeUntil(this.destroy$);
+
     this.signalRService.sessionCreated
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((session) => {
-        this.currentSession = session;
-        this.waitingMessage = 'חדר חזרות פעיל - חפש שירים';
-        this.showCreateSessionButton = false;
-      });
-    // Listen for song selection
+      .pipe(takeUntilDestroy)
+      .subscribe((session: any) => this.handleSessionCreated(session));
+
     this.signalRService.joinedSession
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((session) => {
-        this.currentSession = session;
-        if (this.isAdmin) {
-          this.waitingMessage = 'חדר חזרות פעיל - חפש שירים';
-        } else {
-          this.waitingMessage = 'מחובר לחדר - ממתין לבחירת שיר';
-        }
-        this.showCreateSessionButton = false;
-      });
+      .pipe(takeUntilDestroy)
+      .subscribe((session: any) => this.handleJoinedSession(session));
 
     this.signalRService.noActiveSession
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((message) => {
-        this.waitingMessage = message;
-        if (this.isAdmin) {
-          this.showCreateSessionButton = true;
-        }
-      });
+      .pipe(takeUntilDestroy)
+      .subscribe((message: any) => this.handleNoActiveSession(message));
 
     this.signalRService.newSessionAvailable
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((message) => {
-        // הצטרף אוטומטית לחדר החדש
-        this.signalRService.joinRehearsal();
-      });
+      .pipe(takeUntilDestroy)
+      .subscribe(() => this.signalRService.joinRehearsal());
 
     this.signalRService.songSelected
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((song) => {
-        console.log('🎵 Song selected in Main Component, navigating to live:', song.name);
-        // מעבר לעמוד Live עם זמן המתנה קצר
-        setTimeout(() => {
-          this.router.navigate(['/live']);
-        }, 500);
-      });
+      .pipe(takeUntilDestroy)
+      .subscribe(song => this.handleSongSelected(song));
 
     this.signalRService.sessionEnded
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.currentSession = null;
-        this.waitingMessage = 'החזרה הסתיימה';
-        if (this.isAdmin) {
-          this.showCreateSessionButton = true;
-        }
-      });
+      .pipe(takeUntilDestroy)
+      .subscribe(() => this.handleSessionEnded());
 
     this.signalRService.userJoined
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((username) => {
-        if (!this.connectedUsers.includes(username)) {
-          this.connectedUsers.push(username);
-        }
-      });
+      .pipe(takeUntilDestroy)
+      .subscribe((username: any) => this.handleUserJoined(username));
 
     this.signalRService.userLeft
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((username) => {
-        this.connectedUsers = this.connectedUsers.filter(user => user !== username);
-      });
+      .pipe(takeUntilDestroy)
+      .subscribe((username: any) => this.handleUserLeft(username));
 
     this.signalRService.error
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((error) => {
-        console.error('SignalR Error:', error);
-        this.waitingMessage = `שגיאה: ${error}`;
-      });
+      .pipe(takeUntilDestroy)
+      .subscribe((error: any) => this.handleError(error));
+  }
 
-    // התחבר לחדר חזרות
-    await this.signalRService.joinRehearsal();
+  private handleSessionCreated(session: RehearsalSession): void {
+    this.currentSession = session;
+    this.waitingMessage = 'חדר חזרות פעיל - חפש שירים';
+    this.showCreateSessionButton = false;
+  }
+
+  private handleJoinedSession(session: RehearsalSession): void {
+    this.currentSession = session;
+    this.waitingMessage = this.isAdmin
+      ? 'חדר חזרות פעיל - חפש שירים'
+      : 'מחובר לחדר - ממתין לבחירת שיר';
+    this.showCreateSessionButton = false;
+  }
+
+  private handleNoActiveSession(message: string): void {
+    this.waitingMessage = message;
+    this.showCreateSessionButton = this.isAdmin;
+  }
+
+  private handleSongSelected(song: any): void {
+    console.log('🎵 Song selected in Main Component, navigating to live:', song.name);
+    setTimeout(() => this.router.navigate(['/live']), 500);
+  }
+
+  private handleSessionEnded(): void {
+    this.currentSession = null;
+    this.waitingMessage = 'החזרה הסתיימה';
+    this.showCreateSessionButton = this.isAdmin;
+  }
+
+  private handleUserJoined(username: string): void {
+    if (!this.connectedUsers.includes(username)) {
+      this.connectedUsers.push(username);
+    }
+  }
+
+  private handleUserLeft(username: string): void {
+    this.connectedUsers = this.connectedUsers.filter(user => user !== username);
+  }
+
+  private handleError(error: string): void {
+    console.error('SignalR Error:', error);
+    this.waitingMessage = `שגיאה: ${error}`;
   }
 
   async createSession(): Promise<void> {
@@ -141,16 +145,14 @@ export class MainComponent implements OnInit, OnDestroy {
     this.songService.searchSongs(this.searchQuery)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (results) => {
+        next: results => {
           this.searchResults = results.songs;
-          this.searching = false;
           this.router.navigate(['/results'], {
             state: { results: this.searchResults, query: this.searchQuery }
           });
         },
-        error: () => {
-          this.searching = false;
-        }
+        error: () => console.error('Search failed'),
+        complete: () => this.searching = false
       });
   }
 

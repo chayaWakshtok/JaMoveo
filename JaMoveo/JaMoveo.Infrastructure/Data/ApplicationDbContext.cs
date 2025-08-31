@@ -17,7 +17,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
 
     public DbSet<Song> Songs { get; set; }
-    public DbSet<SongWord> SongWords { get; set; }
     public DbSet<RehearsalSession> RehearsalSessions { get; set; }
     public DbSet<UserRehearsalSession> UserRehearsalSessions { get; set; }
 
@@ -69,24 +68,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                   .WithOne(rs => rs.CurrentSong)
                   .HasForeignKey(rs => rs.CurrentSongId)
                   .OnDelete(DeleteBehavior.SetNull);
-
-            entity.HasMany(s => s.SongWords)
-                .WithOne(rs => rs.Song)
-                .HasForeignKey(rs => rs.SongId)
-                .OnDelete(DeleteBehavior.SetNull);
-        });
-
-        modelBuilder.Entity<SongWord>(entity =>
-        {
-            entity.HasKey(s => s.Id);
-            entity.Property(s => s.Lyrics).IsRequired().HasMaxLength(10000);
-            entity.Property(s => s.Chords).HasMaxLength(10000);
-
-
-            entity.HasOne(rs => rs.Song)
-                  .WithMany(u => u.SongWords)
-                  .HasForeignKey(rs => rs.SongId)
-                  .OnDelete(DeleteBehavior.Restrict);
         });
 
         // Configure RehearsalSession entity

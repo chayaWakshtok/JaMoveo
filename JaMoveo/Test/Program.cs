@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using JaMoveo.Application.Providers;
+using JaMoveo.Infrastructure.Entities;
 
 Console.WriteLine("Hello, World!");
 
@@ -9,7 +10,7 @@ var scraper = new Tab4UProvider();
 try
 {
     // Search for songs
-    string searchTerm = "אבא מלך";
+    string searchTerm = "מעלות";
     var results = await scraper.FetchSongAsync(searchTerm, 1);
 
     Console.WriteLine($"Found {results.TotalResults} results for '{results.SearchTerm}'");
@@ -21,6 +22,7 @@ try
         Console.WriteLine($"Title: {song.Title}");
         Console.WriteLine($"Artist: {song.Artist}");
         Console.WriteLine($"URL: {song.Url}");
+        Console.WriteLine($"Artist Image: {song.ImageUrl ?? "No image available"}");
         Console.WriteLine($"Song ID: {song.SongId}");
         Console.WriteLine($"Has Tabs: {song.HasTabs}");
         Console.WriteLine($"Has Notes: {song.HasNotes}");
@@ -46,21 +48,46 @@ try
         Console.WriteLine($"Artists: {string.Join(", ", songDetails.Artists)}");
         Console.WriteLine($"Category: {songDetails.Category}");
         Console.WriteLine($"Song ID: {songDetails.SongId}");
-        Console.WriteLine($"Number of sections: {songDetails.Sections.Count}");
-        Console.WriteLine($"Known chords: {string.Join(", ", songDetails.ChordDefinitions.Keys)}");
+        Console.WriteLine($"Total lines: {songDetails.Lines.Count}");
 
-        Console.WriteLine("\nWord-by-word format (first 5 lines):");
-        for (int i = 0; i < songDetails.Sections.Count; i++)
+
+        var traditionalLines = songDetails.ToTraditionalFormat();
+
+        foreach (var line in traditionalLines)
         {
-            var line = songDetails.Sections[i];
-            Console.WriteLine($"Line {i + 1}:");
-            foreach (var pair in line.Lines)
+            if (line.IsSectionHeader)
+            {
+                Console.WriteLine($"\n{line.LyricsLine}"); // [פתיחה], [סיום], etc.
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(line.ChordsLine.Trim()))
+                {
+                    Console.WriteLine(line.ChordsLine); // Chord line
+                }
+                Console.WriteLine(line.LyricsLine); // Lyrics line
+            }
+        }
+
+        // Or use ToString() for automatic formatting
+        foreach (var line in traditionalLines)
+        {
+            Console.WriteLine(line.ToString());
+        }
+
+        // Show word-by-word format (first 10 pairs)
+        Console.WriteLine("\nWord-by-word format:");
+        foreach (var line in songDetails.Lines)
+        {
+            Console.WriteLine("Line: [");
+            foreach (var pair in line)
             {
                 if (!string.IsNullOrEmpty(pair.Chords))
-                    Console.WriteLine($"  {pair.Chords}");
-                Console.WriteLine($" {pair.Lyrics}");
+                    Console.WriteLine($"  {{\"lyrics\": \"{pair.Lyrics}\", \"chords\": \"{pair.Chords}\"}}");
+                else
+                    Console.WriteLine($"  {{\"lyrics\": \"{pair.Lyrics}\"}}");
             }
-            Console.WriteLine();
+            Console.WriteLine("]");
         }
 
 

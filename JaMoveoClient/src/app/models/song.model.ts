@@ -4,12 +4,11 @@ export interface Song {
   artist: string;
   imageUrl: string;
   language: string;
-  songWords: SongWord[];
-}
+  lines: SongWord[][];}
 
 export interface SongWord {
   lyrics: string;
-  chords: string;
+  chords?: string;
 }
 
 

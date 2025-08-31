@@ -13,6 +13,7 @@ namespace JaMoveo.Application.Providers
 {
     public class SongResult
     {
+        public string ImageUrl { get; set; }
         public string Title { get; set; }
         public string Artist { get; set; }
         public string Url { get; set; }
@@ -159,6 +160,43 @@ namespace JaMoveo.Application.Providers
                 {
                     song.Artist = artistNode.InnerText.Trim();
                 }
+
+                var artistImageNode = linkNode.SelectSingleNode(".//span[@class='ruArtPhoto relZ']");
+                if (artistImageNode != null)
+                {
+                    var style = artistImageNode.GetAttributeValue("style", "");
+                    if (!string.IsNullOrEmpty(style))
+                    {
+                        // Extract URL from background-image:url(...)
+                        var imageMatch = System.Text.RegularExpressions.Regex.Match(style, @"background-image:url\(([^)]+)\)");
+                        if (imageMatch.Success)
+                        {
+                            string imageUrl = imageMatch.Groups[1].Value.Trim();
+
+                            // Handle relative URLs
+                            if (imageUrl.StartsWith("/"))
+                            {
+                                song.ImageUrl = BaseUrl + imageUrl;
+                            }
+                            else if (!imageUrl.StartsWith("http"))
+                            {
+                                song.ImageUrl = BaseUrl + "/" + imageUrl;
+                            }
+                            else
+                            {
+                                song.ImageUrl = imageUrl;
+                            }
+
+                            // Check if it's the default "no artist pic" image
+                            if (imageUrl.Contains("noArtPicDu.svg"))
+                            {
+                                song.ImageUrl = ""; 
+                            }
+                        }
+                    }
+                }
+
+
 
                 // Check for tabs and notes availability (look in parent row)
                 var parentRow = songNode.Ancestors("tr").FirstOrDefault();

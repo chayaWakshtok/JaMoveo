@@ -75,3 +75,4 @@ C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\Test\obj\Debug\net9.0\Test.genrun
 C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\Test\obj\Debug\net9.0\ref\Test.dll
 C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\Test\bin\Debug\net9.0\JaMoveo.Core.dll
 C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\Test\bin\Debug\net9.0\JaMoveo.Core.pdb
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\Test\obj\Debug\net9.0\Test.sourcelink.json

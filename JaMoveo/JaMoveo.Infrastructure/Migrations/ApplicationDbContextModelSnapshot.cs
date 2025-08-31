@@ -172,6 +172,10 @@ namespace JaMoveo.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("SongContentJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("SongIdProvider")
                         .HasColumnType("int");
 
@@ -183,34 +187,6 @@ namespace JaMoveo.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Songs");
-                });
-
-            modelBuilder.Entity("JaMoveo.Infrastructure.Entities.SongWord", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Chords")
-                        .IsRequired()
-                        .HasMaxLength(10000)
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Lyrics")
-                        .IsRequired()
-                        .HasMaxLength(10000)
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SongId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SongId");
-
-                    b.ToTable("SongWords");
                 });
 
             modelBuilder.Entity("JaMoveo.Infrastructure.Entities.UserRehearsalSession", b =>
@@ -407,17 +383,6 @@ namespace JaMoveo.Infrastructure.Migrations
                     b.Navigation("CurrentSong");
                 });
 
-            modelBuilder.Entity("JaMoveo.Infrastructure.Entities.SongWord", b =>
-                {
-                    b.HasOne("JaMoveo.Infrastructure.Entities.Song", "Song")
-                        .WithMany("SongWords")
-                        .HasForeignKey("SongId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Song");
-                });
-
             modelBuilder.Entity("JaMoveo.Infrastructure.Entities.UserRehearsalSession", b =>
                 {
                     b.HasOne("JaMoveo.Infrastructure.Entities.RehearsalSession", "RehearsalSession")
@@ -503,8 +468,6 @@ namespace JaMoveo.Infrastructure.Migrations
             modelBuilder.Entity("JaMoveo.Infrastructure.Entities.Song", b =>
                 {
                     b.Navigation("RehearsalSessions");
-
-                    b.Navigation("SongWords");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,9 +30,11 @@ namespace JaMoveo.Infrastructure.Entities
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        [Column(TypeName = "nvarchar(max)")]
+        public string SongContentJson { get; set; }
+
         // Navigation properties
         public virtual ICollection<RehearsalSession> RehearsalSessions { get; set; } = new List<RehearsalSession>();
 
-        public virtual ICollection<SongWord> SongWords { get; set; } =new List<SongWord>();
     }
 }

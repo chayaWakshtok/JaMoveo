@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace JaMoveo.Core.Services
@@ -154,20 +155,11 @@ namespace JaMoveo.Core.Services
                 Name = session.CurrentSong.Name,
                 Artist = session.CurrentSong.Artist,
                 ImageUrl = session.CurrentSong.ImageUrl,
-                SongWords = SongWordDtos(session.CurrentSong.SongWords.ToList()),
+                Lines = JsonSerializer.Deserialize<List<List<WordChordPair>>>(session.CurrentSong.SongContentJson),
                 Language = session.CurrentSong.Language
             };
         }
 
-        private List<SongWordDto> SongWordDtos(List<SongWord> songWords)
-        {
-            var list = new List<SongWordDto>();
-            songWords.ForEach(s =>
-            {
-                list.Add(new SongWordDto() { Chords = s.Chords, Lyrics = s.Lyrics });
-            });
-            return list;
-        }
 
         public async Task<List<string>> GetConnectedUsersAsync(string sessionId)
         {

@@ -40,7 +40,8 @@ namespace JaMoveo.Infrastructure.Migrations
                     ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     SongUrlProvider = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Language = table.Column<string>(type: "nvarchar(2)", maxLength: 2, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    SongContentJson = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -96,27 +97,6 @@ namespace JaMoveo.Infrastructure.Migrations
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SongWords",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Chords = table.Column<string>(type: "nvarchar(max)", maxLength: 10000, nullable: false),
-                    Lyrics = table.Column<string>(type: "nvarchar(max)", maxLength: 10000, nullable: false),
-                    SongId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SongWords", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SongWords_Songs_SongId",
-                        column: x => x.SongId,
-                        principalTable: "Songs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -300,11 +280,6 @@ namespace JaMoveo.Infrastructure.Migrations
                 filter: "[NormalizedName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SongWords_SongId",
-                table: "SongWords",
-                column: "SongId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserClaims_UserId",
                 table: "UserClaims",
                 column: "UserId");
@@ -347,9 +322,6 @@ namespace JaMoveo.Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "RoleClaims");
-
-            migrationBuilder.DropTable(
-                name: "SongWords");
 
             migrationBuilder.DropTable(
                 name: "UserClaims");

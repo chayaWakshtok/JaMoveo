@@ -8,6 +8,7 @@
   <div class="search-results">
     @for(song of searchResults; track song) {
     <div class="song-card" (click)="selectSong(song)">
+      <img [src]="song.imageUrl" [alt]="song.artist" class="song-image">
       <div class="song-info">
         <h3 class="song-name">{{ song.title }}</h3>
         <p class="song-artist">{{ song.artist }}</p>

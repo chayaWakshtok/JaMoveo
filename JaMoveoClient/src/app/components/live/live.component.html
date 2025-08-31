@@ -21,48 +21,49 @@
   <div class="song-header">
     <h1 class="song-title">{{ currentSong.name }}</h1>
     <h2 class="song-artist">{{ currentSong.artist }}</h2>
+    <div class="song-language">
+      <span class="language-badge" [class]="'lang-' + currentSong.language">
+        {{ currentSong.language === 'he' ? 'hebrew' : 'English' }}
+      </span>
+    </div>
   </div>
 
-  <div class="song-content">
-    <!-- For singers - lyrics only -->
-    @if(isSinger){
-    <div class="lyrics-only">
-      <h3>Lyrics</h3>
-      <div class="lyrics-text">
-        <!-- @for (line of formatLyrics(currentSong.lyrics); track $index) {
-        <p class="lyrics-line">
-          {{ line }}
-        </p>
-        } -->
-      </div>
-    </div>
-    }
-    @else {
-    <div class="full-content">
-      <div class="chords-section">
-        <h3>Chords</h3>
-        <div class="chords-text">
-          <!-- @for (line of formatChords(currentSong.chords); track $index) {
-          <p class="chord-line">
-            {{ line }}
-          </p>
-          } -->
+
+  <div class="song-content" #songContainer>
+    @if(currentSong?.lines&& processedLines.length > 0){
+    <div class="structured-content">
+      @for(line of processedLines; track $index) {
+      <div class="song-line" [attr.dir]="getLineDirection(line)">
+        @if(!isSinger && hasChords(line)){
+        <div class="chords-line">
+          @for(word of line.words; track $index) {
+          <span class="chord-span" [style.margin-left.px]="$index > 0 ? getWordSpacing(line.words[$index-1], word) : 0">
+            <span class="chord" [style.min-width.px]="word.width" [style.display]="'inline-block'"
+              [style.text-align]="'left'">
+              {{ word.chords || '' }}
+            </span>
+          </span>
+          }
 
         </div>
-      </div>
-
-      <div class="lyrics-section">
-        <h3>Lyrics</h3>
-        <div class="lyrics-text">
-          <!-- @for (line of formatLyrics(currentSong.lyrics); track $index) {
-          <p class="lyrics-line">
-            {{ line }}
-          </p>
-          } -->
+        }
+        <!-- שורת מילים -->
+        <div class="lyrics-line">
+          @for(word of line.words; track $index) {
+          <span class="word-container"
+            [style.margin-left.px]="$index > 0 ? getWordSpacing(line.words[$index-1], word) : 0">
+            <span class="word" [style.min-width.px]="word.width" [style.display]="'inline-block'">
+              {{ word.lyrics }}
+            </span>
+          </span>
+          }
         </div>
       </div>
+      }
+
     </div>
     }
+
   </div>
 
   <!-- Controls -->

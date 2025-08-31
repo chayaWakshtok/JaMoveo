@@ -65,124 +65,123 @@ namespace JaMoveo.Application.Providers
             var contentNode = doc.DocumentNode.SelectSingleNode("//div[@id='songContentTPL']");
             if (contentNode != null)
             {
-                songContent.ChordsAndLyrics = contentNode.InnerText;
-
-                // Parse structured chord and lyric data
-                ParseStructuredContent(contentNode, songContent);
+                ParseContentToWordChordPairs(contentNode, songContent);
             }
 
             return songContent;
         }
 
-        private static void ParseStructuredContent(HtmlNode contentNode, SongContent songContent)
+
+
+
+        private static void ParseContentToWordChordPairs(HtmlNode contentNode, SongContent songContent)
         {
             var tables = contentNode.SelectNodes(".//table");
             if (tables == null) return;
 
-            ChordLyricSection currentSection = null;
-            string currentSectionType = "verse";
-
             foreach (var table in tables)
             {
-                // Check if this table contains a section header
-                var sectionHeader = table.SelectSingleNode(".//span[@class='titLine']");
-                if (sectionHeader != null)
+                var rows = table.SelectNodes(".//tr");
+                if (rows == null) continue;
+
+                string pendingChords = "";
+
+                foreach (var row in rows)
                 {
-                    currentSectionType = sectionHeader.InnerText.Trim().TrimEnd(':');
-                    currentSection = new ChordLyricSection { SectionType = currentSectionType };
-                    songContent.Sections.Add(currentSection);
-                    continue;
-                }
+                    var chordCell = row.SelectSingleNode(".//td[@class='chords']");
+                    var lyricCell = row.SelectSingleNode(".//td[@class='song']");
 
-                // If no current section, create a default one
-                if (currentSection == null)
-                {
-                    currentSection = new ChordLyricSection { SectionType = currentSectionType };
-                    songContent.Sections.Add(currentSection);
-                }
-
-                ParseTableForWordFormat(table, currentSection, songContent);
-            }
-
-        }
-
-        private static string ExtractChordsWithPositions(HtmlNode chordCell, Dictionary<string, string> chordDefinitions)
-        {
-            // First try to get chords from spans
-            var chordSpans = chordCell.SelectNodes(".//span[contains(@class, 'c_C')]");
-
-            if (chordSpans != null)
-            {
-                foreach (var span in chordSpans)
-                {
-                    var chordName = span.InnerText.Trim();
-                    if (!string.IsNullOrEmpty(chordName))
+                    // Check for section headers like "סיום:" in titLine spans
+                    var sectionHeader = row.SelectSingleNode(".//span[@class='titLine']");
+                    if (sectionHeader != null)
                     {
-                        // Extract chord definition from onmouseover attribute
-                        var onMouseOver = span.GetAttributeValue("onmouseover", "");
-                        if (!string.IsNullOrEmpty(onMouseOver))
+                        // This is a section header, we can optionally add it as a line
+                        var headerText = sectionHeader.InnerText.Trim();
+                        if (!string.IsNullOrEmpty(headerText))
                         {
-                            var defMatch = System.Text.RegularExpressions.Regex.Match(onMouseOver, @"'([^']+)'");
-                            if (defMatch.Success && !chordDefinitions.ContainsKey(chordName))
+                            var headerLine = new List<WordChordPair> { new WordChordPair($"[{headerText}]") };
+                            songContent.Lines.Add(headerLine);
+                        }
+                        continue;
+                    }
+
+                    if (chordCell != null)
+                    {
+                        // Get chords with preserved spacing
+                        pendingChords = chordCell.InnerText?.Replace("&nbsp;", " ") ?? "";
+                    }
+                    else if (lyricCell != null)
+                    {
+                        // Get lyrics with preserved spacing
+                        var lyricsText = lyricCell.InnerText?.Replace("&nbsp;", " ") ?? "";
+
+                        if (!string.IsNullOrEmpty(lyricsText.Trim()))
+                        {
+                            // Create word-chord pairs for this line
+                            var linePairs = CreateWordChordPairs(pendingChords, lyricsText);
+                            if (linePairs.Count > 0)
                             {
-                                chordDefinitions[chordName] = defMatch.Groups[1].Value;
+                                songContent.Lines.Add(linePairs);
                             }
                         }
+
+                        pendingChords = "";
                     }
                 }
             }
-
-            // Return the full text with positioning preserved
-            return chordCell.InnerText ?? "";
         }
 
-        private static void ParseTableForWordFormat(HtmlNode table, ChordLyricSection section, SongContent songContent)
+        private static List<WordChordPair> CreateWordChordPairs(string chordLine, string lyricsLine)
         {
-            var rows = table.SelectNodes(".//tr");
-            if (rows == null) return;
+            var pairs = new List<WordChordPair>();
 
-            string chordLine = "";
-            string lyricLine = "";
+            if (string.IsNullOrEmpty(lyricsLine?.Trim()))
+                return pairs;
 
-            foreach (var row in rows)
+            // Extract chords from chord line
+            var chords = ExtractChords(chordLine);
+
+            // Split lyrics into words
+            var words = lyricsLine.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            // Match chords to words
+            int chordIndex = 0;
+            foreach (var word in words)
             {
-                var chordCell = row.SelectSingleNode(".//td[@class='chords']");
-                var lyricCell = row.SelectSingleNode(".//td[@class='song']");
+                string assignedChord = null;
 
-                if (chordCell != null)
+                if (chordIndex < chords.Count)
                 {
-                    chordLine = ExtractChordsWithPositions(chordCell, songContent.ChordDefinitions);
+                    assignedChord = chords[chordIndex];
+                    chordIndex++;
                 }
-                else if (lyricCell != null)
-                {
-                    lyricLine = CleanLyricsText(lyricCell.InnerText);
 
-                    // Process the chord/lyric pair
-                    if (!string.IsNullOrEmpty(lyricLine.Trim()))
-                    {
-                        // Also add to legacy format
-                        var legacyLine = new ChordLyricLine
-                        {
-                            Chords = chordLine,
-                            Lyrics = lyricLine,
-                        };
-                        section.Lines.Add(legacyLine);
-                    }
-                    // Reset for next pair
-                    chordLine = "";
-                    lyricLine = "";
-                }
+                pairs.Add(new WordChordPair(word.Trim(), assignedChord));
             }
+
+            return pairs;
         }
 
-
-        private static string CleanLyricsText(string text)
+        private static List<string> ExtractChords(string chordText)
         {
-            // Replace HTML entities and clean up spacing
-            return System.Web.HttpUtility.HtmlDecode(text)
-                .Replace("&nbsp;", " ")
-                .Replace("  ", " ")
-                .Trim();
+            var chords = new List<string>();
+
+            if (string.IsNullOrEmpty(chordText))
+                return chords;
+
+            // Find chord patterns
+            var chordPattern = @"([A-G][#b]?(?:maj|min|m|dim|aug|sus|add)?[0-9]*(?:/[A-G][#b]?)?)";
+            var matches = System.Text.RegularExpressions.Regex.Matches(chordText, chordPattern);
+
+            foreach (System.Text.RegularExpressions.Match match in matches)
+            {
+                if (match.Success && !string.IsNullOrEmpty(match.Value.Trim()))
+                {
+                    chords.Add(match.Value.Trim());
+                }
+            }
+
+            return chords;
         }
        
     }

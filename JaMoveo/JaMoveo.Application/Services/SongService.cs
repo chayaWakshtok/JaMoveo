@@ -6,7 +6,9 @@ using JaMoveo.Infrastructure.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace JaMoveo.Core.Services
@@ -55,7 +57,7 @@ namespace JaMoveo.Core.Services
             if (song == null)
             {
                 SongContent songDetails = await _externalSongProvider.GetSongDetailsAsync(songResult.Url);
-                var mapSong = MapToSong(songDetails,songResult);
+                var mapSong = MapToSong(songDetails, songResult);
                 song = await _unitOfWork.Songs.CreateAsync(mapSong);
             }
 
@@ -78,51 +80,59 @@ namespace JaMoveo.Core.Services
         {
             return new Song
             {
-                SongUrlProvider=songResult.Url,
-                ImageUrl="",
+                SongUrlProvider = songResult.Url,
+                ImageUrl = songResult.ImageUrl,
                 SongIdProvider = song.SongId,
                 Name = songResult.Title,
                 Artist = song.Artist,
-                SongWords = SongWords(song),
-                Language=""
+                SongContentJson= JsonSerializer.Serialize(song.Lines),
+                Language = DetectLanguage(songResult.Title)
             };
         }
 
         private SongDto MapToSongDto(Song song)
         {
+            List<List<WordChordPair>> list = new List<List<WordChordPair>>();
+            if (!string.IsNullOrEmpty(song.SongContentJson))
+            {
+                try
+                {
+                    list = JsonSerializer.Deserialize<List<List<WordChordPair>>>(song.SongContentJson);
+                }
+                catch (JsonException ex)
+                {
+                }
+            }
+
             return new SongDto
             {
                 Id = song.Id,
                 Name = song.Name,
                 Artist = song.Artist,
                 ImageUrl = song.ImageUrl,
-                SongWords = SongWordDtos(song.SongWords.ToList()),
+                Lines = list,
                 Language = song.Language
             };
         }
-        private List<SongWord> SongWords(SongContent song)
-        {
-            var list = new List<SongWord>();
-            song.Sections.ForEach(s =>
-            {
-                s.Lines.ForEach(line =>
-                {
-                    list.Add(new SongWord() { Chords = line.Chords, Lyrics = line.Lyrics });
-                });
+        //private List<SongWord> SongWords(SongContent song)
+        //{
+        //    var list = new List<SongWord>();
+        //    song.ToTraditionalFormat().ForEach(s =>
+        //    {
+        //        list.Add(new SongWord() { Chords = s.ChordsLine, Lyrics = s.LyricsLine });
+        //    });
+        //    return list;
+        //}
 
-            });
-            return list;
-        }
-
-        private List<SongWordDto> SongWordDtos(List<SongWord> songWords)
-        {
-            var list = new List<SongWordDto>();
-            songWords.ForEach(s =>
-            {
-                list.Add(new SongWordDto() { Chords = s.Chords, Lyrics = s.Lyrics });
-            });
-            return list;
-        }
+        //private List<SongWordDto> SongWordDtos(List<SongWord> songWords)
+        //{
+        //    var list = new List<SongWordDto>();
+        //    songWords.ForEach(s =>
+        //    {
+        //        list.Add(new SongWordDto() { Chords = s.Chords, Lyrics = s.Lyrics });
+        //    });
+        //    return list;
+        //}
 
         private SongSearchResultDto MapToSearchResultDto(Song song)
         {
@@ -132,8 +142,18 @@ namespace JaMoveo.Core.Services
                 Name = song.Name,
                 Artist = song.Artist,
                 ImageUrl = song.ImageUrl,
-                Language = song.Language
+                Language = DetectLanguage(song.Name)
             };
+        }
+
+        private string DetectLanguage(string text)
+        {
+            // Simple Hebrew detection
+            if (text.Any(c => c >= 0x0590 && c <= 0x05FF))
+            {
+                return "he";
+            }
+            return "en";
         }
 
 

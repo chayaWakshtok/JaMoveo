@@ -1,20 +1,10 @@
 ﻿using JaMoveo.Application.Interfaces;
 using JaMoveo.Core.Interfaces;
-using JaMoveo.Infrastructure.Data;
 using JaMoveo.Infrastructure.Entities;
-using JaMoveo.Infrastructure.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace JaMoveo.Application.Hubs
 {
@@ -47,40 +37,38 @@ namespace JaMoveo.Application.Hubs
                 var username = user?.UserName ?? "Unknown";
                 var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
 
-                _logger.LogInformation("משתמש {Username} מנסה להצטרף לחדר חזרות (Admin: {IsAdmin})", username, isAdmin);
+                _logger.LogInformation("User {Username} is trying to join rehearsal room (Admin: {IsAdmin})", username, isAdmin);
 
-
-                // מציאת חדר החזרות הפעיל
+                // Find the active rehearsal session
                 var activeSession = await _rehearsalService.GetActiveSessionAsync();
 
-                // אם אין חדר פעיל ומשתמש הוא מנהל - צור חדר חדש
+                // If there is no active session and user is admin - create a new session
                 if (activeSession == null && isAdmin)
                 {
-                    _logger.LogInformation("אין חדר פעיל, יוצר חדר חדש עבור מנהל {Username}", username);
+                    _logger.LogInformation("No active session, creating a new session for admin {Username}", username);
                     activeSession = await _rehearsalService.CreateSessionAsync(userId);
 
                     await Groups.AddToGroupAsync(Context.ConnectionId, "rehearsal");
                     await Clients.Caller.SendAsync("SessionCreated", activeSession);
 
-                    _logger.LogInformation("חדר חזרות חדש נוצר בהצלחה: {SessionId}", activeSession.SessionId);
+                    _logger.LogInformation("New rehearsal session created successfully: {SessionId}", activeSession.SessionId);
                     return;
                 }
-
 
                 if (activeSession != null)
                 {
                     await _rehearsalService.JoinSessionAsync(userId, activeSession.SessionId);
                     await Groups.AddToGroupAsync(Context.ConnectionId, "rehearsal");
 
-                    _logger.LogInformation("משתמש {Username} הצטרף לחדר החזרות", username);
+                    _logger.LogInformation("User {Username} joined the rehearsal room", username);
 
-                    // הודעה לכל המשתמשים על הצטרפות
+                    // Notify all users about the new participant
                     await Clients.Group("rehearsal").SendAsync("UserJoined", username);
 
-                    // שלח פרטי החדר למשתמש החדש
+                    // Send session details to the new user
                     await Clients.Caller.SendAsync("JoinedSession", activeSession);
 
-                    // אם יש שיר פעיל, שלח אותו למשתמש החדש
+                    // If there is an active song, send it to the new user
                     if (activeSession.CurrentSongId.HasValue)
                     {
                         var currentSong = await _songService.GetSongByIdAsync(activeSession.CurrentSongId.Value);
@@ -89,14 +77,14 @@ namespace JaMoveo.Application.Hubs
                 }
                 else
                 {
-                    _logger.LogWarning("אין חדר חזרות פעיל ומשתמש {Username} אינו מנהל", username);
+                    _logger.LogWarning("No active rehearsal session and user {Username} is not an admin", username);
                     await Clients.Caller.SendAsync("NoActiveSession");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה בהצטרפות לחדר חזרות");
-                await Clients.Caller.SendAsync("Error", "שגיאה בהצטרפות לחדר החזרות");
+                _logger.LogError(ex, "Error while joining rehearsal room");
+                await Clients.Caller.SendAsync("Error", "Error while joining rehearsal room");
             }
         }
 
@@ -107,7 +95,7 @@ namespace JaMoveo.Application.Hubs
             {
                 var adminId = GetCurrentUserId();
 
-                // סיום חדר קיים אם יש
+                // End existing session if any
                 var existingSession = await _rehearsalService.GetActiveSessionAsync();
                 if (existingSession != null)
                 {
@@ -115,21 +103,21 @@ namespace JaMoveo.Application.Hubs
                     await Clients.Group("rehearsal").SendAsync("SessionEnded");
                 }
 
-                // יצירת חדר חדש
+                // Create a new session
                 var newSession = await _rehearsalService.CreateSessionAsync(adminId);
 
-                _logger.LogInformation("מנהל {AdminId} יצר חדר חזרות חדש: {SessionId}", adminId, newSession.SessionId);
+                _logger.LogInformation("Admin {AdminId} created a new rehearsal session: {SessionId}", adminId, newSession.SessionId);
 
                 await Groups.AddToGroupAsync(Context.ConnectionId, "rehearsal");
                 await Clients.Caller.SendAsync("SessionCreated", newSession);
 
-                // הודעה לכל המשתמשים על חדר חדש
-                await Clients.All.SendAsync("NewSessionAvailable", "חדר חזרות חדש נפתח!");
+                // Notify all users about the new session
+                await Clients.All.SendAsync("NewSessionAvailable", "A new rehearsal session has started!");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה ביצירת חדר חזרות חדש");
-                await Clients.Caller.SendAsync("Error", "שגיאה ביצירת חדר חזרות חדש");
+                _logger.LogError(ex, "Error while creating a new rehearsal session");
+                await Clients.Caller.SendAsync("Error", "Error while creating a new rehearsal session");
             }
         }
 
@@ -147,14 +135,14 @@ namespace JaMoveo.Application.Hubs
                     await _rehearsalService.LeaveSessionAsync(userId, activeSession.SessionId);
                     await Groups.RemoveFromGroupAsync(Context.ConnectionId, "rehearsal");
 
-                    _logger.LogInformation("משתמש {Username} עזב את חדר החזרות", username);
+                    _logger.LogInformation("User {Username} left the rehearsal room", username);
 
                     await Clients.Group("rehearsal").SendAsync("UserLeft", username);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה ביציאה מחדר חזרות");
+                _logger.LogError(ex, "Error while leaving rehearsal room");
             }
         }
 
@@ -170,20 +158,20 @@ namespace JaMoveo.Application.Hubs
                 {
                     var song = await _songService.GetSongByIdAsync(songId);
 
-                    _logger.LogInformation("מנהל בחר שיר: {SongName} - {Artist}", song.Name, song.Artist);
+                    _logger.LogInformation("Admin selected song: {SongName} - {Artist}", song.Name, song.Artist);
 
-                    // שלח את השיר לכל המשתמשים המחוברים
+                    // Send the selected song to all connected users
                     await Clients.Group("rehearsal").SendAsync("SongSelected", song);
                 }
                 else
                 {
-                    await Clients.Caller.SendAsync("Error", "לא ניתן לבחור את השיר");
+                    await Clients.Caller.SendAsync("Error", "Unable to select the song");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה בבחירת שיר: {SongId}", songId);
-                await Clients.Caller.SendAsync("Error", "שגיאה בבחירת השיר");
+                _logger.LogError(ex, "Error selecting song: {SongId}", songId);
+                await Clients.Caller.SendAsync("Error", "Error selecting the song");
             }
         }
 
@@ -197,20 +185,20 @@ namespace JaMoveo.Application.Hubs
 
                 if (success)
                 {
-                    _logger.LogInformation("מנהל סיים את חדר החזרות");
+                    _logger.LogInformation("Admin ended the rehearsal session");
 
-                    // הודעה לכל המשתמשים שהחזרה הסתיימה
+                    // Notify all users that the session ended
                     await Clients.Group("rehearsal").SendAsync("SessionEnded");
                 }
                 else
                 {
-                    await Clients.Caller.SendAsync("Error", "לא ניתן לסיים את החדר");
+                    await Clients.Caller.SendAsync("Error", "Unable to end the session");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה בסיום חדר חזרות");
-                await Clients.Caller.SendAsync("Error", "שגיאה בסיום החדר");
+                _logger.LogError(ex, "Error while ending rehearsal session");
+                await Clients.Caller.SendAsync("Error", "Error while ending the session");
             }
         }
 
@@ -230,11 +218,11 @@ namespace JaMoveo.Application.Hubs
 
                 await Clients.Group("rehearsal").SendAsync("UserLeft", username);
 
-                _logger.LogInformation("משתמש {Username} התנתק", username);
+                _logger.LogInformation("User {Username} disconnected", username);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה בניתוק משתמש");
+                _logger.LogError(ex, "Error while disconnecting user");
             }
 
             await base.OnDisconnectedAsync(exception);
@@ -245,7 +233,7 @@ namespace JaMoveo.Application.Hubs
             var userIdClaim = Context.User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
             {
-                throw new UnauthorizedAccessException("משתמש לא מזוהה");
+                throw new UnauthorizedAccessException("User not identified");
             }
             return userId;
         }

@@ -1,26 +1,12 @@
 ﻿using HtmlAgilityPack;
 using JaMoveo.Application.Interfaces;
-using JaMoveo.Application.Providers;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using JaMoveo.Core.DTOs;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace JaMoveo.Application.Providers
 {
-    public class SongResult
-    {
-        public string ImageUrl { get; set; }
-        public string Title { get; set; }
-        public string Artist { get; set; }
-        public string Url { get; set; }
-        public bool HasTabs { get; set; }
-        public bool HasNotes { get; set; }
-        public int SongId { get; set; }
-    }
+
 
     public class Tab4USearchResponse
     {
@@ -57,14 +43,11 @@ namespace JaMoveo.Application.Providers
 
                 string url = $"{BaseUrl}/resultsSimple?tab=songs&q={encodedSearchTerm}&s={offset}";
 
-                Console.WriteLine($"Requesting: {url}");
-
                 string html = await _httpClient.GetStringAsync(url);
                 return ParseSearchResults(html, query);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error during search: {ex.Message}");
                 throw;
             }
         }
@@ -213,24 +196,7 @@ namespace JaMoveo.Application.Providers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error parsing song info: {ex.Message}");
                 return null;
-            }
-        }
-
-        public async Task<SongContent> GetOnlyWordsAsync(string songUrl)
-        {
-            try
-            {
-                string fullUrl = songUrl.StartsWith("http") ? songUrl : BaseUrl + "/" + songUrl.TrimStart('/')+ "#song";
-                string html = await _httpClient.GetStringAsync(fullUrl);
-
-                return Tab4USongParser.ParseSongPage(html, fullUrl);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error fetching song details: {ex.Message}");
-                throw;
             }
         }
 
@@ -245,7 +211,6 @@ namespace JaMoveo.Application.Providers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching song details: {ex.Message}");
                 throw;
             }
         }

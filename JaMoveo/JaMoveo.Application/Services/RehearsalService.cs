@@ -2,12 +2,7 @@
 using JaMoveo.Core.Interfaces;
 using JaMoveo.Infrastructure.Entities;
 using JaMoveo.Infrastructure.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace JaMoveo.Core.Services
 {
@@ -22,14 +17,12 @@ namespace JaMoveo.Core.Services
 
         public async Task<RehearsalSessionDto> CreateSessionAsync(int adminUserId)
         {
-            // בדיקה שהמשתמש קיים ומנהל
             var admin = await _unitOfWork.Users.GetByIdAsync(adminUserId);
             if (admin == null || admin.Role != UserRole.Admin)
             {
                 throw new UnauthorizedAccessException("רק מנהלים יכולים ליצור חדר חזרות");
             }
 
-            // בדיקה שאין חדר חזרות פעיל
             var existingSession = await _unitOfWork.RehearsalSessions.GetActiveSessionAsync();
             if (existingSession != null)
             {
@@ -69,7 +62,6 @@ namespace JaMoveo.Core.Services
                 return false;
             }
 
-            // בדיקה שהמשתמש לא כבר מחובר
             var existingConnection = session.ConnectedUsers
                 .FirstOrDefault(cu => cu.UserId == userId && cu.LeftAt == null);
 

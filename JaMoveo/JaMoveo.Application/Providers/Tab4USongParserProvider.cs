@@ -1,9 +1,5 @@
 ﻿using HtmlAgilityPack;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using JaMoveo.Core.DTOs;
 
 namespace JaMoveo.Application.Providers
 {

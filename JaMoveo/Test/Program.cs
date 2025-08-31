@@ -51,30 +51,6 @@ try
         Console.WriteLine($"Total lines: {songDetails.Lines.Count}");
 
 
-        var traditionalLines = songDetails.ToTraditionalFormat();
-
-        foreach (var line in traditionalLines)
-        {
-            if (line.IsSectionHeader)
-            {
-                Console.WriteLine($"\n{line.LyricsLine}"); // [פתיחה], [סיום], etc.
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(line.ChordsLine.Trim()))
-                {
-                    Console.WriteLine(line.ChordsLine); // Chord line
-                }
-                Console.WriteLine(line.LyricsLine); // Lyrics line
-            }
-        }
-
-        // Or use ToString() for automatic formatting
-        foreach (var line in traditionalLines)
-        {
-            Console.WriteLine(line.ToString());
-        }
-
         // Show word-by-word format (first 10 pairs)
         Console.WriteLine("\nWord-by-word format:");
         foreach (var line in songDetails.Lines)
@@ -89,10 +65,6 @@ try
             }
             Console.WriteLine("]");
         }
-
-
-        // Here you would parse the song content to extract chords and lyrics
-        //ParseSongContent(songContent);
     }
 }
 catch (Exception ex)

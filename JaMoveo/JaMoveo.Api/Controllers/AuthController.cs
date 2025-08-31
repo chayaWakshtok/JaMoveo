@@ -1,7 +1,6 @@
 ﻿using JaMoveo.Application.Interfaces;
 using JaMoveo.Core.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JaMoveo.Api.Controllers
@@ -31,7 +30,7 @@ namespace JaMoveo.Api.Controllers
 
                 await _authService.SignUpAsync(request);
 
-                return Ok(new { message = "המשתמש נוצר בהצלחה" });
+                return Ok(new { message = "User created successfully" });
             }
             catch (ArgumentException ex)
             {
@@ -39,8 +38,8 @@ namespace JaMoveo.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה ברישום משתמש: {Username}", request.Username);
-                return StatusCode(500, new { message = "אירעה שגיאה במערכת" });
+                _logger.LogError(ex, "Error registering user: {Username}", request.Username);
+                return StatusCode(500, new { message = "An internal error occurred" });
             }
         }
 
@@ -56,7 +55,7 @@ namespace JaMoveo.Api.Controllers
 
                 await _authService.SignUpAdminAsync(request);
 
-                return Ok(new { message = "משתמש מנהל נוצר בהצלחה" });
+                return Ok(new { message = "Admin user created successfully" });
             }
             catch (ArgumentException ex)
             {
@@ -64,8 +63,8 @@ namespace JaMoveo.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה ברישום מנהל: {Username}", request.Username);
-                return StatusCode(500, new { message = "אירעה שגיאה במערכת" });
+                _logger.LogError(ex, "Error registering admin: {Username}", request.Username);
+                return StatusCode(500, new { message = "An internal error occurred" });
             }
         }
 
@@ -89,8 +88,8 @@ namespace JaMoveo.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה בהתחברות עבור: {Username}", request.Username);
-                return StatusCode(500, new { message = "אירעה שגיאה במערכת" });
+                _logger.LogError(ex, "Error logging in for: {Username}", request.Username);
+                return StatusCode(500, new { message = "An internal error occurred" });
             }
         }
 
@@ -104,8 +103,8 @@ namespace JaMoveo.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה בבדיקת זמינות שם משתמש: {Username}", username);
-                return StatusCode(500, new { message = "אירעה שגיאה במערכת" });
+                _logger.LogError(ex, "Error checking username availability: {Username}", username);
+                return StatusCode(500, new { message = "An internal error occurred" });
             }
         }
 
@@ -126,15 +125,15 @@ namespace JaMoveo.Api.Controllers
 
                 if (user == null)
                 {
-                    return NotFound(new { message = "משתמש לא נמצא" });
+                    return NotFound(new { message = "User not found" });
                 }
 
                 return Ok(user);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה בקבלת פרופיל משתמש");
-                return StatusCode(500, new { message = "אירעה שגיאה במערכת" });
+                _logger.LogError(ex, "Error retrieving user profile");
+                return StatusCode(500, new { message = "An internal error occurred" });
             }
         }
     }

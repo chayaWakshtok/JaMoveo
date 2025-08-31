@@ -1,6 +1,5 @@
 ﻿using JaMoveo.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -29,7 +28,7 @@ namespace JaMoveo.Api.Controllers
                 var userId = GetCurrentUserId();
                 var session = await _rehearsalService.CreateSessionAsync(userId);
 
-                _logger.LogInformation("נוצר חדר חזרות חדש על ידי: {UserId}", userId);
+                _logger.LogInformation("New rehearsal room created by: {UserId}", userId);
 
                 return Ok(session);
             }
@@ -43,8 +42,8 @@ namespace JaMoveo.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה ביצירת חדר חזרות");
-                return StatusCode(500, new { message = "אירעה שגיאה במערכת" });
+                _logger.LogError(ex, "Error creating rehearsal room");
+                return StatusCode(500, new { message = "An internal error occurred" });
             }
         }
 
@@ -57,15 +56,15 @@ namespace JaMoveo.Api.Controllers
 
                 if (session == null)
                 {
-                    return NotFound(new { message = "אין חדר חזרות פעיל כרגע" });
+                    return NotFound(new { message = "No active rehearsal room available" });
                 }
 
                 return Ok(session);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה בקבלת חדר חזרות פעיל");
-                return StatusCode(500, new { message = "אירעה שגיאה במערכת" });
+                _logger.LogError(ex, "Error getting active rehearsal room");
+                return StatusCode(500, new { message = "An internal error occurred" });
             }
         }
 
@@ -79,17 +78,17 @@ namespace JaMoveo.Api.Controllers
 
                 if (!success)
                 {
-                    return BadRequest(new { message = "לא ניתן להצטרף לחדר החזרות" });
+                    return BadRequest(new { message = "Unable to join rehearsal room" });
                 }
 
-                _logger.LogInformation("משתמש {UserId} הצטרף לחדר חזרות {SessionId}", userId, sessionId);
+                _logger.LogInformation("User {UserId} joined rehearsal room {SessionId}", userId, sessionId);
 
-                return Ok(new { message = "הצטרפת בהצלחה לחדר החזרות" });
+                return Ok(new { message = "Successfully joined the rehearsal room" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה בהצטרפות לחדר חזרות");
-                return StatusCode(500, new { message = "אירעה שגיאה במערכת" });
+                _logger.LogError(ex, "Error joining rehearsal room");
+                return StatusCode(500, new { message = "An internal error occurred" });
             }
         }
 
@@ -103,17 +102,17 @@ namespace JaMoveo.Api.Controllers
 
                 if (!success)
                 {
-                    return BadRequest(new { message = "לא ניתן לעזוב את חדר החזרות" });
+                    return BadRequest(new { message = "Unable to leave rehearsal room" });
                 }
 
-                _logger.LogInformation("משתמש {UserId} עזב את חדר חזרות {SessionId}", userId, sessionId);
+                _logger.LogInformation("User {UserId} left rehearsal room {SessionId}", userId, sessionId);
 
-                return Ok(new { message = "עזבת את חדר החזרות" });
+                return Ok(new { message = "You have left the rehearsal room" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה ביציאה מחדר חזרות");
-                return StatusCode(500, new { message = "אירעה שגיאה במערכת" });
+                _logger.LogError(ex, "Error leaving rehearsal room");
+                return StatusCode(500, new { message = "An internal error occurred" });
             }
         }
 
@@ -128,17 +127,17 @@ namespace JaMoveo.Api.Controllers
 
                 if (!success)
                 {
-                    return BadRequest(new { message = "לא ניתן לבחור את השיר" });
+                    return BadRequest(new { message = "Unable to select the song" });
                 }
 
-                _logger.LogInformation("מנהל {AdminId} בחר שיר {SongId}", adminId, songId);
+                _logger.LogInformation("Admin {AdminId} selected song {SongId}", adminId, songId);
 
-                return Ok(new { message = "השיר נבחר בהצלחה" });
+                return Ok(new { message = "Song selected successfully" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה בבחירת שיר");
-                return StatusCode(500, new { message = "אירעה שגיאה במערכת" });
+                _logger.LogError(ex, "Error selecting song");
+                return StatusCode(500, new { message = "An internal error occurred" });
             }
         }
 
@@ -153,17 +152,17 @@ namespace JaMoveo.Api.Controllers
 
                 if (!success)
                 {
-                    return BadRequest(new { message = "לא ניתן לסיים את חדר החזרות" });
+                    return BadRequest(new { message = "Unable to end rehearsal room" });
                 }
 
-                _logger.LogInformation("מנהל {AdminId} סיים את חדר החזרות", adminId);
+                _logger.LogInformation("Admin {AdminId} ended the rehearsal room", adminId);
 
-                return Ok(new { message = "חדר החזרות הסתיים" });
+                return Ok(new { message = "Rehearsal room ended" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה בסיום חדר חזרות");
-                return StatusCode(500, new { message = "אירעה שגיאה במערכת" });
+                _logger.LogError(ex, "Error ending rehearsal room");
+                return StatusCode(500, new { message = "An internal error occurred" });
             }
         }
 
@@ -176,15 +175,15 @@ namespace JaMoveo.Api.Controllers
 
                 if (song == null)
                 {
-                    return NotFound(new { message = "אין שיר פעיל כרגע" });
+                    return NotFound(new { message = "No active song available" });
                 }
 
                 return Ok(song);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה בקבלת השיר הנוכחי");
-                return StatusCode(500, new { message = "אירעה שגיאה במערכת" });
+                _logger.LogError(ex, "Error getting current song");
+                return StatusCode(500, new { message = "An internal error occurred" });
             }
         }
 
@@ -198,8 +197,8 @@ namespace JaMoveo.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "שגיאה בקבלת משתמשים מחוברים");
-                return StatusCode(500, new { message = "אירעה שגיאה במערכת" });
+                _logger.LogError(ex, "Error getting connected users");
+                return StatusCode(500, new { message = "An internal error occurred" });
             }
         }
 

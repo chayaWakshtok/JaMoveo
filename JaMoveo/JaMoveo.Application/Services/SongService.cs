@@ -3,13 +3,7 @@ using JaMoveo.Application.Providers;
 using JaMoveo.Core.DTOs;
 using JaMoveo.Core.Interfaces;
 using JaMoveo.Infrastructure.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace JaMoveo.Core.Services
 {
@@ -114,25 +108,6 @@ namespace JaMoveo.Core.Services
                 Language = song.Language
             };
         }
-        //private List<SongWord> SongWords(SongContent song)
-        //{
-        //    var list = new List<SongWord>();
-        //    song.ToTraditionalFormat().ForEach(s =>
-        //    {
-        //        list.Add(new SongWord() { Chords = s.ChordsLine, Lyrics = s.LyricsLine });
-        //    });
-        //    return list;
-        //}
-
-        //private List<SongWordDto> SongWordDtos(List<SongWord> songWords)
-        //{
-        //    var list = new List<SongWordDto>();
-        //    songWords.ForEach(s =>
-        //    {
-        //        list.Add(new SongWordDto() { Chords = s.Chords, Lyrics = s.Lyrics });
-        //    });
-        //    return list;
-        //}
 
         private SongSearchResultDto MapToSearchResultDto(Song song)
         {
@@ -155,7 +130,5 @@ namespace JaMoveo.Core.Services
             }
             return "en";
         }
-
-
     }
 }

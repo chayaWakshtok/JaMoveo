@@ -10,38 +10,25 @@ on:
       - main
 
 jobs:
-  build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+  build_and_deploy:
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
-    permissions:
-       id-token: write
-       contents: read
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-          lfs: false
 
-      # 👇 שימוש בגרסת Node.js נכונה (Angular דורש >= 20.19)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Use Node.js 20
         uses: actions/setup-node@v3
         with:
-          node-version: '20.19.0'
+          node-version: 20
 
-      - name: Install OIDC Client from Core Package
-        run: npm install @actions/core@1.6.0 @actions/http-client
+      - name: Install dependencies and build
+        run: |
+          cd JaMoveoClient
+          npm ci
+          npm run build
 
-      - name: Get Id Token
-        uses: actions/github-script@v6
-        id: idtoken
-        with:
-           script: |
-               const coredemo = require('@actions/core')
-               return await coredemo.getIDToken()
-           result-encoding: string
-
-      - name: Build And Deploy
+      - name: Deploy to Azure Static Web Apps
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
@@ -50,4 +37,5 @@ jobs:
           app_location: "./JaMoveoClient"
           api_location: ""
           output_location: "dist/solidev-apps"
-          github_id_token: ${{ steps.idtoken.outputs.result }}
+          skip_app_build: true   # 👈 מבטיח ש-Azure לא יבנה שוב עם Node 18
+

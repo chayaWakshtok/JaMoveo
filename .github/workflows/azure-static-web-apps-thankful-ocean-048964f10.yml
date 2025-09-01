@@ -13,7 +13,6 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
 
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,13 +34,7 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: "upload"
-          app_location: "./JaMoveoClient"
-          api_location: ""
-          output_location: \"./\"
-          skip_app_build: true   # 👈 מבטיח ש-Azure לא יבנה שוב עם Node 18
-
-
-
-
-
-
+          app_location: "./JaMoveoClient"       # תיקיית האפליקציה
+          api_location: ""                      # אם אין API, משאירים ריק
+          output_location: "dist"               # תיקיית build שנוצרת אחרי npm run build
+          skip_app_build: true                  # מונע Azure מלהריץ build נוסף

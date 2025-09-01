@@ -30,8 +30,9 @@ jobs:
 
       - name: Deploy to Azure Static Web Apps
         run: |
-          npx swa deploy "./JaMoveoClient/dist/JaMoveoClient/browser" \
+          npx swa deploy "/home/runner/work/JaMoveo/JaMoveo/JaMoveoClient/dist/JaMoveoClient/browser" \
             --app-name "JaMoveoClient" \
             --env "production" \
             --subscription-id "1bc832b1-6817-4ad5-94c1-1c8a7c07551d" \
             --deployment-token "bacb961d2a8b56d0a7b213cbb8b932f0b9c5def88f22ec83edd934c879d4b09401-89332315-69b5-4f38-9be6-42772c8b8fc40101912080b6e910"
+

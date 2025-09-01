@@ -37,8 +37,9 @@ jobs:
           action: "upload"
           app_location: "./JaMoveoClient"
           api_location: ""
-          output_location: "dist/JaMoveoClient"
+          output_location: \"./\"
           skip_app_build: true   # 👈 מבטיח ש-Azure לא יבנה שוב עם Node 18
+
 
 
 

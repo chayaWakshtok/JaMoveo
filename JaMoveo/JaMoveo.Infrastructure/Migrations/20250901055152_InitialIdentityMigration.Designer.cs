@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JaMoveo.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250831170809_InitialIdentityMigration")]
+    [Migration("20250901055152_InitialIdentityMigration")]
     partial class InitialIdentityMigration
     {
         /// <inheritdoc />

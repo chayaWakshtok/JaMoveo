@@ -187,7 +187,7 @@
     "Parameters": [
       {
         "Name": "songResult",
-        "Type": "JaMoveo.Application.Providers.SongResult",
+        "Type": "JaMoveo.Core.DTOs.SongResult",
         "IsRequired": true
       }
     ],

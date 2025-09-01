@@ -13,6 +13,7 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
 
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -38,4 +39,5 @@ jobs:
           api_location: ""
           output_location: "dist/solidev-apps"
           skip_app_build: true   # 👈 מבטיח ש-Azure לא יבנה שוב עם Node 18
+
 

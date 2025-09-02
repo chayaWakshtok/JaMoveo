@@ -191,7 +191,7 @@ app.MapControllers();
 // Health Check endpoint
 app.MapHealthChecks("/health");
 // Initialize database and Identity
-await InitializeDatabaseAsync(app);
+//await InitializeDatabaseAsync(app);
 
 app.Run();
 

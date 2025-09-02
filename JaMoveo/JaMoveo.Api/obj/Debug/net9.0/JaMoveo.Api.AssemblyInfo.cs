@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("JaMoveo.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b2a083577520fd5581dba33f45c3ccb09e9f74ee")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+75eda0db5698dad650f8972bd7b350587346c5e1")]
 [assembly: System.Reflection.AssemblyProductAttribute("JaMoveo.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("JaMoveo.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

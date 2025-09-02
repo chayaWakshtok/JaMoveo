@@ -53,7 +53,7 @@ namespace JaMoveo.Core.Services
                 SongContent songDetails = await _externalSongProvider.GetSongDetailsAsync(songResult.Url);
                 var mapSong = MapToSong(songDetails, songResult);
                 song = await _unitOfWork.Songs.CreateAsync(mapSong);
-                _unitOfWork.SaveChangesAsync();
+               await _unitOfWork.SaveChangesAsync();
             }
 
             return MapToSongDto(song);

@@ -12,34 +12,34 @@ export class RehearsalService {
   constructor(private http: HttpClient) {}
 
   createSession(): Observable<RehearsalSession> {
-    return this.http.post<RehearsalSession>(`${API_CONFIG.BASE_URL}/rehearsal/create`, {});
+    return this.http.post<RehearsalSession>(`${API_CONFIG.BASE_URL}rehearsal/create`, {});
   }
 
   getActiveSession(): Observable<RehearsalSession> {
-    return this.http.get<RehearsalSession>(`${API_CONFIG.BASE_URL}/rehearsal/active`);
+    return this.http.get<RehearsalSession>(`${API_CONFIG.BASE_URL}rehearsal/active`);
   }
 
   joinSession(sessionId: string): Observable<any> {
-    return this.http.post(`${API_CONFIG.BASE_URL}/rehearsal/join/${sessionId}`, {});
+    return this.http.post(`${API_CONFIG.BASE_URL}rehearsal/join/${sessionId}`, {});
   }
 
   leaveSession(sessionId: string): Observable<any> {
-    return this.http.post(`${API_CONFIG.BASE_URL}/rehearsal/leave/${sessionId}`, {});
+    return this.http.post(`${API_CONFIG.BASE_URL}rehearsal/leave/${sessionId}`, {});
   }
 
   selectSong(songId: number): Observable<any> {
-    return this.http.post(`${API_CONFIG.BASE_URL}/rehearsal/select-song/${songId}`, {});
+    return this.http.post(`${API_CONFIG.BASE_URL}rehearsal/select-song/${songId}`, {});
   }
 
   endSession(): Observable<any> {
-    return this.http.post(`${API_CONFIG.BASE_URL}/rehearsal/end`, {});
+    return this.http.post(`${API_CONFIG.BASE_URL}rehearsal/end`, {});
   }
 
   getCurrentSong(): Observable<Song> {
-    return this.http.get<Song>(`${API_CONFIG.BASE_URL}/rehearsal/current-song`);
+    return this.http.get<Song>(`${API_CONFIG.BASE_URL}rehearsal/current-song`);
   }
 
   getConnectedUsers(sessionId: string): Observable<string[]> {
-    return this.http.get<string[]>(`${API_CONFIG.BASE_URL}/rehearsal/connected-users/${sessionId}`);
+    return this.http.get<string[]>(`${API_CONFIG.BASE_URL}rehearsal/connected-users/${sessionId}`);
   }
 }

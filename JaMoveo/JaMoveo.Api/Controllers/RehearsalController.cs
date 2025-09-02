@@ -175,7 +175,7 @@ namespace JaMoveo.Api.Controllers
 
                 if (song == null)
                 {
-                    return NotFound(new { message = "No active song available" });
+                    return BadRequest(new { message = "No active song available" });
                 }
 
                 return Ok(song);

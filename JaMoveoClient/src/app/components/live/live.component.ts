@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { SignalRService } from '../../services/signalr.service';
 import { Song } from '../../models/song.model';
 import { Router } from '@angular/router';
+import { RehearsalService } from '../../services/rehearsal.service';
 
 @Component({
   selector: 'app-live',
@@ -18,6 +19,7 @@ export class LiveComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private scrollInterval: any;
   private readonly authService = inject(AuthService);
+  private readonly rehearsalService = inject(RehearsalService);
   private readonly signalRService = inject(SignalRService);
   readonly router = inject(Router);
 
@@ -51,11 +53,32 @@ export class LiveComponent implements OnInit, OnDestroy {
       const cachedSong = this.signalRService.getCurrentSong();
 
       if (cachedSong) {
+        console.log('🎵 Got cached song from SignalR:', cachedSong);
         this.currentSong = cachedSong;
-        this.formatSongContent();
         this.loading = false;
         return;
       }
+
+      // אם אין שיר cached, נסה לקבל מהשרת
+      console.log('🔍 No cached song, fetching from server...');
+      this.rehearsalService.getCurrentSong().subscribe({
+        next: (song: any) => {
+          console.log('🎵 Got song from server:', song);
+          this.currentSong = song;
+          this.loading = false;
+        },
+        error: (error: any) => {
+          console.error('❌ Error fetching current song:', error);
+          this.error = 'שגיאה בטעינת השיר הנוכחי';
+          this.loading = false;
+
+          // אם אין שיר, חזור לעמוד הראשי
+          setTimeout(() => {
+            this.router.navigate(['/main']);
+          }, 2000);
+        }
+      });
+
 
     } catch (error) {
       console.error('Error in loadCurrentSong:', error);

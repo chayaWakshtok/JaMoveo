@@ -1,0 +1,15 @@
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\bin\Release\net9.0\JaMoveo.Infrastructure.deps.json
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\bin\Release\net9.0\JaMoveo.Infrastructure.runtimeconfig.json
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\bin\Release\net9.0\JaMoveo.Infrastructure.dll
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\bin\Release\net9.0\JaMoveo.Infrastructure.pdb
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Release\net9.0\JaMoveo.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Release\net9.0\JaMoveo.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Release\net9.0\JaMoveo.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Release\net9.0\JaMoveo.Infrastructure.AssemblyInfo.cs
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Release\net9.0\JaMoveo.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Release\net9.0\JaMoveo.Infrastructure.sourcelink.json
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Release\net9.0\JaMoveo.Infrastructure.dll
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Release\net9.0\refint\JaMoveo.Infrastructure.dll
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Release\net9.0\JaMoveo.Infrastructure.pdb
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Release\net9.0\JaMoveo.Infrastructure.genruntimeconfig.cache
+C:\Users\User\Documents\GitHub\JaMoveo\JaMoveo\JaMoveo.Infrastructure\obj\Release\net9.0\ref\JaMoveo.Infrastructure.dll

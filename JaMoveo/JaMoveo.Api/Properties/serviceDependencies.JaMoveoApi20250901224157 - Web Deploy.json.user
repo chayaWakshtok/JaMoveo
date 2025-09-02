@@ -1,0 +1,39 @@
+{
+  "dependencies": {
+    "apis1": {
+      "restored": true,
+      "restoreTime": "2025-09-01T20:13:30.2802652Z"
+    },
+    "signalr1": {
+      "restored": true,
+      "restoreTime": "2025-09-01T20:27:05.093568Z"
+    }
+  },
+  "parameters": {
+    "signalr1.serviceConnectorResourceGroupName": {
+      "Name": "signalr1.serviceConnectorResourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "JaMoveo"
+    },
+    "signalr1.resourceGroupName": {
+      "Name": "signalr1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "JaMoveo"
+    },
+    "apis1.resourceGroupName": {
+      "Name": "apis1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "JaMoveo"
+    },
+    "apis1.subscriptionId": {
+      "Name": "apis1.subscriptionId",
+      "Type": "subscription",
+      "Value": "1bc832b1-6817-4ad5-94c1-1c8a7c07551d"
+    },
+    "signalr1.subscriptionId": {
+      "Name": "signalr1.subscriptionId",
+      "Type": "subscription",
+      "Value": "1bc832b1-6817-4ad5-94c1-1c8a7c07551d"
+    }
+  }
+}

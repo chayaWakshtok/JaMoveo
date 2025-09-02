@@ -29,17 +29,17 @@
     </div>
 
     <div class="song-content" #songContainer>
-      @if (currentSong?.lines && processedLines.length > 0) {
+      @if (currentSong.lines && processedLines.length > 0) {
         <div class="structured-content">
           @for (line of processedLines; track $index) {
             <div class="song-line" [attr.dir]="getLineDirection(line)">
               @if (!isSinger && hasChords(line)) {
                 <div class="chords-line">
                   @for (word of line.words; track $index) {
-                    <span class="chord-span" 
+                    <span class="chord-span"
                           [style.margin-left.px]="$index > 0 ? getWordSpacing(line.words[$index-1], word) : 0">
-                      <span class="chord" 
-                            [style.min-width.px]="word.width" 
+                      <span class="chord"
+                            [style.min-width.px]="word.width"
                             [style.display]="'inline-block'"
                             [style.text-align]="'left'">
                         {{ word.chords || '' }}
@@ -48,14 +48,14 @@
                   }
                 </div>
               }
-              
+
               <!-- שורת מילים -->
               <div class="lyrics-line">
                 @for (word of line.words; track $index) {
                   <span class="word-container"
                         [style.margin-left.px]="$index > 0 ? getWordSpacing(line.words[$index-1], word) : 0">
-                    <span class="word" 
-                          [style.min-width.px]="word.width" 
+                    <span class="word"
+                          [style.min-width.px]="word.width"
                           [style.display]="'inline-block'">
                       {{ word.lyrics }}
                     </span>
@@ -70,8 +70,8 @@
 
     <!-- Controls -->
     <div class="controls">
-      <button class="scroll-toggle" 
-              (click)="toggleAutoScroll()" 
+      <button class="scroll-toggle"
+              (click)="toggleAutoScroll()"
               [class.active]="autoScroll">
         {{ autoScroll ? '⏸️ Stop Scroll' : '▶️ Auto Scroll' }}
       </button>

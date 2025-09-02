@@ -144,7 +144,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp", policy =>
     {
-        policy.WithOrigins("http://localhost:4200", "https://jamoveo-frontend.onrender.com")
+        policy.WithOrigins("http://localhost:4200", "https://gentle-glacier-080b6e910.1.azurestaticapps.net")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();

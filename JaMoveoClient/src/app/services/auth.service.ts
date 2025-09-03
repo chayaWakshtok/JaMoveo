@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { User, LoginRequest, SignupRequest, LoginResponse } from '../models/user.model';
+import { User, LoginRequest, SignupRequest, LoginResponse, EInstrument } from '../models/user.model';
 import { API_CONFIG } from '../config/api.config';
 
 
@@ -67,6 +67,6 @@ export class AuthService {
 
   isSinger(): boolean {
     const user = this.currentUserValue;
-    return user?.instrument === 'Vocals';
+    return user?.instrument === EInstrument.Singers;
   }
 }

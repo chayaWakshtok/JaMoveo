@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("JaMoveo.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+75eda0db5698dad650f8972bd7b350587346c5e1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c913fcd2d67863519b52b9959cba90cd794b1d06")]
 [assembly: System.Reflection.AssemblyProductAttribute("JaMoveo.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("JaMoveo.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
